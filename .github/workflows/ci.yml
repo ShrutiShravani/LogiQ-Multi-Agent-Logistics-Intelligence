@@ -46,5 +46,4 @@ jobs:
             -e REDIS_HOST=redis \
             pricing-api-test
           sleep 10
-          # If this fails, it means your model or JSON weren't found!
           docker ps | grep test-api
