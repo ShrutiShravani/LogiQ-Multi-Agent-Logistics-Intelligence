@@ -4,16 +4,14 @@ from src.agents.agents.pricing_agent import PricingAgent
 from src.agents.agents.route_agent import RouteAgent
 import fitz
 from src.agents.agents.orchestrator import create_logisticsgraph
-from dotenv import load_dotenv
 from openai import OpenAI
 import os
 import json
 import mlflow
 import glob
 from langchain_openai import ChatOpenAI
+from datetime import datetime
 
-
-load_dotenv()
 
 def extract_text(pdf_path):
         """Utility to turn the PDF file into a string the LLM can read"""
@@ -22,6 +20,12 @@ def extract_text(pdf_path):
         for page in doc:
             text += page.get_text()
         return text
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 
 if __name__=="__main__":
     # 1. Initialize Agents
@@ -42,7 +46,8 @@ if __name__=="__main__":
     stats_for_metrics = []
     all_shipment_data=[]
     all_audit_traces={}
-
+    mlflow.set_experiment("Logistics_Pricing")
+    
     # 2. Build the Graph
     with mlflow.start_run(run_name="7_Waybill_Stress_Test"):
         app = create_logisticsgraph(doc_agent, route_agent, pricing_agent, critic_agent)
@@ -160,7 +165,7 @@ if __name__=="__main__":
 
         
             with open("batch_results.json", "w") as f:
-                json.dump(all_shipment_data, f, indent=4)
+                json.dump(all_shipment_data, f, indent=4,default=json_serial)
             with open("batch_full_audit.json","w") as f:
                 json.dump(all_audit_traces,f,indent=4)
 

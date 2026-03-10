@@ -5,11 +5,8 @@ from src.agents.agents.route_agent import RouteAgent
 import fitz
 from src.agents.agents.orchestrator import create_logisticsgraph
 from dotenv import load_dotenv
-from openai import OpenAI
 import os
 import json
-import mlflow
-import glob
 from langchain_openai import ChatOpenAI
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from src.models.data_models import ShipmentModel
@@ -46,6 +43,9 @@ logistics_app = create_logisticsgraph(doc_agent, route_agent, pricing_agent, cri
 @app.get("/health")
 def healthcheck():
     return {"status":"healthy","model":"gpt-40-mini"}
+@app.get("/")
+def home():
+    return {"status": "success", "message": "Pricing API is running without MLflow!"}
 
 @app.post("/process-waybill")
 async def process_Waybill(file:UploadFile=File(...)):
@@ -79,6 +79,7 @@ async def process_Waybill(file:UploadFile=File(...)):
                 "raw_text": waybill_text
             }
             # Save DLQ immediately
+            os.makedirs("data/processed", exist_ok=True)
             with open("data/processed/manual_review.json", "a") as f:
                 f.write(json.dumps(review_entry) + "\n")
           

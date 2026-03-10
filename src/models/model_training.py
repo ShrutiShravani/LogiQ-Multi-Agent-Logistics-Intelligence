@@ -10,13 +10,16 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import json
 import yaml
 from mlflow.tracking import MlflowClient
+import platform
 
 def model_train():
     # 1. Setup MLflow Experiment
+    
     with open("params.yaml") as f:
         params_yaml=yaml.safe_load(f)
 
-    mlflow.set_experiment("NYC_Logistics_Pricing")
+
+    mlflow.set_experiment("Logistics_Pricing")
     
     with mlflow.start_run():
         # Load the transformed data we just created
@@ -97,8 +100,8 @@ def model_train():
         mlflow.log_artifact("feature_importance.png")
         
         # 7. Save Model correctly for MLflow Registry
-        os.makedirs("models", exist_ok=True)
-        model.save_model("models/pricing_xgb_model.json")
+        os.makedirs("trained_models", exist_ok=True)
+        model.save_model("trained_models/pricing_xgb_model.json")
         mlflow.xgboost.log_model(model,artifact_path="pricing_model")
 
         #register_model

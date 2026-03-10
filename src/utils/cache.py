@@ -1,9 +1,17 @@
 import redis
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Logisticscache:
     def __init__(self):
-        self.client= redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+        host = os.getenv("REDIS_HOST", "localhost")
+        
+        # 2. Look for 'REDIS_PORT', default to 6379
+        port = int(os.getenv("REDIS_PORT", 6379))
+        self.client= redis.Redis(host=host, port=port, db=0, decode_responses=True)
         self.hits = 0
         self.misses = 0
 

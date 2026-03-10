@@ -4,16 +4,22 @@ from src.models.data_models import ShipmentModel
 from src.agents.agents.base_agent import BaseAgent
 import numpy as np
 import mlflow.pyfunc
+import os
+import platform
 
 class PricingAgent(BaseAgent):
-    def __init__(self,model_path:str="models\pricing_xgb_model.json"):
+    def __init__(self):
         super().__init__(name="PricingAgent")
-        model_name= "xgboost_logistics_pricing"
-        stage = "Production"
-        self.model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}@{stage}")
-      
-        #self.model=xgb.Booster()
-        #self.model.load_model(model_path)
+        model_path=os.path.join("trained_models", "pricing_xgb_model.json")
+
+        self.model=xgb.Booster()
+        if os.path.exists(model_path):
+            self.model.load_model(model_path)
+            print(f"XGBoost model loaded successfully from: {model_path}")
+        else:
+            print(f"ERROR: Model file not found at: {model_path}")
+            # List files to help you debug in the Docker logs
+            print(f"Current directory contents: {os.listdir('.')}")
         self.feature_cols=['passenger_count', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude', 'total_weight_kg', 'distance_km', 'hour', 'day_of_week', 'is_holiday', 'duration_min', 'traffic_density_score', 'is_rush_hour', 'is_weekend', 'is_high_demand', 'type_bicycle', 'type_e_scooter', 'type_truck', 'type_van']
     
     def process(self, shipment: ShipmentModel) -> ShipmentModel:
@@ -22,10 +28,10 @@ class PricingAgent(BaseAgent):
        
         X = df[self.feature_cols]
         print(f"DEBUG: Feature Vector -> {X.iloc[0].to_dict()}")
-        #dmat=xgb.DMatrix(X)
+        dmat=xgb.DMatrix(X)
 
         #xgbosst predicts abse price
-        base_prediction=self.model.predict(X)[0]
+        base_prediction=self.model.predict(dmat)[0]
         actual_price = np.expm1(base_prediction)
         shipment.predicted_base_price=round(float(actual_price),2)
         shipment.raw_model_prediction= shipment.predicted_base_price

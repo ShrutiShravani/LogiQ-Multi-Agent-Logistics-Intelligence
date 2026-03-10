@@ -32,8 +32,8 @@ stages:
       size: 232550193
     - path: src/models/model_training.py
       hash: md5
-      md5: 97185b92e02a73500ac0b9e694161841
-      size: 4225
+      md5: effd55991cf7e00094ba3a7bb7fc1fc6
+      size: 4784
     params:
       params.yaml:
         train.learning_rate: 0.03

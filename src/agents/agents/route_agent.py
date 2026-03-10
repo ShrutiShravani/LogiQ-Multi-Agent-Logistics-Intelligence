@@ -23,7 +23,7 @@ def safe_api_call(retries=3, delay=1.5):
                     except Exception as e:
                         # If we hit a rate limit (429) or timeout
                         if "429" in str(e) or "timeout" in str(e).lower():
-                            print(f"⚠️ Rate limit/Timeout. Retry {attempt+1} in {delay}s...")
+                            print(f"Rate limit/Timeout. Retry {attempt+1} in {delay}s...")
                             time.sleep(delay * (attempt + 1)) # Exponential backoff
                         else:
                             raise e

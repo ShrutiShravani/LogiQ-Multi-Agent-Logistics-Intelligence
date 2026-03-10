@@ -2,12 +2,19 @@ from src.agents.agents.base_agent import BaseAgent
 from src.models.data_models import ShipmentModel
 import json
 import math
+import os
 
 class CriticAgent(BaseAgent):
     def __init__(self):
         super().__init__(name="CriticAgent")
-        with open(r"data\transformed\traffic_mapping.json") as f:
-            self.traffic_memory = json.load(f)
+        self.mapping_path = os.path.join("data", "transformed","traffic_mapping.json")
+            # Match the exact path where your NYCFeatureEngineer saved the JSON
+        try:
+            with open(self.mapping_path ,"r") as f:
+                    self.traffic_memory = json.load(f)
+        except FileNotFoundError:
+            print(f"Warning: Traffic mapping not found for {self.name}. Using defaults.")
+            self.traffic_memory = {}
 
         self.v_base = {'e_scooter': 2.0, 'bicycle': 3.0, 'van': 15.0, 'truck': 45.0}
         self.v_rate = {'e_scooter': 0.5, 'bicycle': 1.0, 'van': 2.5, 'truck': 5.0}

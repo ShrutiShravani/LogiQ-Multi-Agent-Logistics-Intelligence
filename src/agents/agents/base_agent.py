@@ -2,14 +2,16 @@ import json
 import holidays
 from datetime import datetime
 from src.models.data_models import ShipmentModel
+import os
 
 class BaseAgent:
     def __init__(self, name: str):
         self.name = name
         self.us_holidays = holidays.US(state='NY')
         try:
+            self.mapping_path = os.path.join("data", "transformed","traffic_mapping.json")
             # Match the exact path where your NYCFeatureEngineer saved the JSON
-            with open(r"data\transformed\traffic_mapping.json") as f:
+            with open(self.mapping_path ,"r") as f:
                 self.traffic_memory = json.load(f)
         except FileNotFoundError:
             print(f"Warning: Traffic mapping not found for {self.name}. Using defaults.")

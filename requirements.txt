@@ -12,9 +12,8 @@ pydantic-settings
 python-dotenv
 
 # Database & Cache
-psycopg2-binary
 redis
-sqlalchemy
+
 
 # Optimization & Routing
 ortools
@@ -31,7 +30,9 @@ mlflow
 pypdf2
 pytesseract
 pillow
-pdf2image
+holidays
+python-multipart
+pymupdf
 
 # API & Web
 fastapi
@@ -40,9 +41,8 @@ httpx
 requests
 
 # Dashboard
-streamlit
 plotly
-folium
+
 
 # Utilities
 tqdm
@@ -53,5 +53,4 @@ uuid
 # Testing
 pytest
 pytest-cov
-holidays
-geopy
+pytest-mock

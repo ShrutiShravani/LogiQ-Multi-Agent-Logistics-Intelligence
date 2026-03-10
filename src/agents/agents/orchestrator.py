@@ -5,7 +5,7 @@ from geopy.geocoders import Nominatim
 import mlflow
 
 #mlflow.set_tracking_uri("http://localhost:5000") # or your local path
-mlflow.set_experiment("Agentic_Pricing_Audit")
+#mlflow.set_experiment("Agentic_Pricing_Audit") #this sets only for local run
 
 class AgentState(TypedDict):
     waybill_text: str

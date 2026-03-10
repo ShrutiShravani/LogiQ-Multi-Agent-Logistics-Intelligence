@@ -1,0 +1,21 @@
+# Exclude environment and cache
+.venv
+venv
+env
+__pycache__
+.pytest_cache
+
+# Exclude local data/logs
+mlruns
+mlflow.db
+data/raw
+logs/
+.git
+
+# Exclude secrets
+.env
+
+# Exclude media (keeps image small)
+**/*.png
+**/*.jpg
+**/*.jpeg
