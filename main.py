@@ -11,7 +11,11 @@ import mlflow
 import glob
 from langchain_openai import ChatOpenAI
 from datetime import datetime
+import numpy as np
 
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI","http://localhost:5000")
+if MLFLOW_TRACKING_URI != "local":
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
 def extract_text(pdf_path):
         """Utility to turn the PDF file into a string the LLM can read"""
@@ -23,6 +27,10 @@ def extract_text(pdf_path):
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
+    if isinstance(obj,(np.float32,np.float64)):
+        return float(obj)
+    if isinstance(obj, (np.int32, np.int64)):
+        return int(obj)
     if isinstance(obj, datetime):
         return obj.isoformat()
     raise TypeError ("Type %s not serializable" % type(obj))

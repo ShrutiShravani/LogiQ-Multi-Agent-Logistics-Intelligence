@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from typing import Optional,List
+from typing import Optional,List,Dict,Any
 
 class ShipmentModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -18,6 +18,11 @@ class ShipmentModel(BaseModel):
     type_bicycle: int = 0
     type_e_scooter: int = 0
     vehicle_type:str="bicycle"
+    route_options:List[Dict[str,Any]]=[]
+    selected_route_index: int = 0
+    delay_delta: float = 0.0
+    extraction_attempts: int = 0
+
 
     # 2. FROM ROUTE AGENT & UTILS
     # These map directly to your XGBoost training columns

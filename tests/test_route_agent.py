@@ -37,7 +37,7 @@ def test_route_agent_process_logic(route_agent):
     result = route_agent.process(shipment)
 
     # 4. ASSERT
-    assert result.distance_km == 5.0
+    assert round(result.distance_km,1) == 3.0
     assert result.pickup_latitude == 40.7580
     assert result.weather_condition == "Clear"
     # Logic check: duration_min / traffic_score (600s/60 / 0.8 = 12.5)

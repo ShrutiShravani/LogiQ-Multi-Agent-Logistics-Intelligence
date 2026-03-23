@@ -169,16 +169,28 @@ class RouteAgent(BaseAgent):
             base_url = "https://api.mapbox.com/directions/v5/mapbox/driving"
     
             # URL structure: {lon},{lat};{d_lon},{d_lat}
-            route_url = f"{base_url}/{lon},{lat};{d_lon},{d_lat}?access_token={self.mapbox_token}&overview=false"
+            route_url = f"{base_url}/{lon},{lat};{d_lon},{d_lat}?access_token={self.mapbox_token}&alternatives=true&overview=false"
             
             print(f"DEBUG: Mapbox Request -> {route_url}")
             
             data = self.get_mapbox_route(route_url)
             
             if data.get("code") == "Ok":
+                shipment.route_options=[]
                 # Distance is in meters, Duration in seconds
-                shipment.distance_km = round(data['routes'][0]['distance'] / 1000, 2)
-                shipment.duration_min = round(data['routes'][0]['duration'] / 60, 2)
+                for idx,r in enumerate(data['routes']):
+                    base_distance_km= round(r['distance']/1000,2)
+                    base_duration_km= round(r['duration']/60,2)
+
+                   
+                    shipment.route_options.append({
+                        "route_index": idx,
+                        "base_distance_km": base_distance_km,
+                        "base_duration_min": base_duration_km,
+                    })
+                print(f"shipment_route:{shipment.route_options}")
+                shipment.distance_km =shipment.route_options['base_distance_km'][0]
+                shipment.duration_min = shipment.route_options['base_duration_min'][0]
                 print(f"SUCCESS: {shipment.distance_km}km, {shipment.duration_min}min")
             else:
                 raise Exception(f"Mapbox_Invalid_Response: {data.get('code')}")
@@ -218,9 +230,13 @@ class RouteAgent(BaseAgent):
         print(shipment.traffic_density_score)
         
         # Real-world Duration Adjustment: If density is 0.5, trip takes 2x longer
-        shipment.duration_min = round(shipment.duration_min / shipment.traffic_density_score, 2)
-        print(shipment.duration_min)
         shipment.weather_condition = weather_label
+
+        for opt in shipment.route_options:
+            opt['adjusted_duration_min'] = round(opt['base_duration_min'] / shipment.traffic_density_score, 2)
+            opt['delay_delta']= round(opt['adjusted_duration_min']-opt['base_duration_min'],2)
+
+        shipment.duration_min = shipment.route_options[0]["adjusted_duration_min"]
 
         trace_entry = (
         f"[{self.name} Success] ->"

@@ -3,6 +3,7 @@ from src.models.data_models import ShipmentModel
 import json
 import math
 import os
+from src.utils.prediction_data_validator import DataValidationError
 
 class CriticAgent(BaseAgent):
     def __init__(self):
@@ -22,8 +23,10 @@ class CriticAgent(BaseAgent):
     def process(self, shipment: ShipmentModel) -> ShipmentModel:
         # --- CONDITION 1: DOCUMENT EXTRACTION ---
         overrides = [] 
+        attempt=0
         if shipment.total_weight_kg <= 0 or shipment.parcel_count <= 0:
             shipment.is_verified = False  
+            shipment.extraction_attempts+=1
             reasons = []
             if shipment.total_weight_kg <= 0:
                 reasons.append("Weight is 0.0 or missing. Look for keywords like 'lbs', 'kg', 'heavy', or 'pounds'.")
@@ -37,6 +40,17 @@ class CriticAgent(BaseAgent):
                 f"Current Extraction -> Weight: {shipment.total_weight_kg}kg, Items: {shipment.parcel_count}. "
                 f"Instruction: Re-analyze the raw text for these specific fields. If truly missing, return 'NULL'."
             )
+
+            if feedback_note:
+                if shipment.extraction_attempts > 3:
+                    print("Document processor failed.Manual entry required")
+                    error_msg = (
+                    "CRITICAL: Document processor failed after 3 attempts. "
+                    "Manual entry required for Weight/Parcel count. "
+                    f"Last Extraction State -> Weight: {shipment.total_weight_kg}, Items: {shipment.parcel_count}"
+                    )
+                    print(error_msg) # Console log for Docker/Backend
+                    raise DataValidationError(error_msg)
             shipment.agent_trace.append(f"CRITIC_FEEDBACK: {feedback_note}")
             return shipment # Orchestrator will now see 'is_verified=False' and retry
 

@@ -9,11 +9,17 @@ import os
 import json
 from langchain_openai import ChatOpenAI
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from src.models.data_models import ShipmentModel
 import uvicorn
+import time
+import random
+from datetime import datetime
+import mlflow
+from collections import deque
+import numpy as np
 
 load_dotenv()
-
+override_window = deque(maxlen=100)
+failure_window = deque(maxlen=100)
 app = FastAPI(title="LogiQ Logistics Intelligence API")
 
 
@@ -22,12 +28,18 @@ llm = ChatOpenAI(
     temperature=0,
     api_key=os.getenv("OPENAI_API_KEY")
 )
+
 doc_agent = DocumentAgent(llm_client=llm)
 route_agent = RouteAgent()
 pricing_agent = PricingAgent()
 critic_agent = CriticAgent()
 input_path= 'data/raw'
 
+
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI","http://localhost:5000")
+if MLFLOW_TRACKING_URI != "local":
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_experiment("Logistics_API_Live")
 
 def extract_text(content:bytes):
     """Utility to turn the PDF file into a string the LLM can read"""
@@ -52,6 +64,7 @@ async def process_Waybill(file:UploadFile=File(...)):
     """
     Accepts a PDF file, runs the full agentic graph, and returns structured data.
     """
+    start_time = time.time()
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400,detail="Only pdf files s are supported.")
 
@@ -60,7 +73,7 @@ async def process_Waybill(file:UploadFile=File(...)):
         #read file content
         waybill_text= extract_text(pdf_bytes)
 
-        #intialzie state
+        #intialize state
         initial_state={
                 "waybill_text": waybill_text,
                 "shipment": None,       
@@ -72,7 +85,35 @@ async def process_Waybill(file:UploadFile=File(...)):
         final_state = logistics_app.invoke(initial_state)
         shipment = final_state['shipment']
 
-        if not shipment.is_verified:
+        # --- 3. METRIC CALCULATIONS ---
+        latency = time.time() - start_time
+
+        # Exact override logic from your main.py
+        is_overridden = any("CriticAgent:" in trace and "Success" not in trace for trace in shipment.agent_trace)
+        is_verified = getattr(shipment, "is_verified", False)
+
+        # Update Sliding Windows
+        override_window.append(1 if is_overridden else 0)
+        failure_window.append(0 if is_verified else 1)
+
+        # Calculate Rates
+        ov_rate = (sum(override_window) / len(override_window)) * 100
+        fail_rate = (sum(failure_window) / len(failure_window)) * 100
+
+        #mlflow logging and alerts
+        with mlflow.start_run(run_name=f"Shipment_{shipment.shipment_id}", nested=True):
+            mlflow.log_metric("latency", latency)
+            mlflow.log_metric("live_override_rate", ov_rate)
+            mlflow.log_metric("live_failure_rate", fail_rate)
+
+
+            if len(override_window) >= 20 and ov_rate > 15.0:
+                mlflow.set_tag("drift_alert", "HIGH_OVERRIDE_RATE")
+            
+            if len(failure_window) >= 20 and fail_rate > 10.0:
+                mlflow.set_tag("system_alert", "HIGH_FAILURE_RATE")
+
+        if not is_verified:
             review_entry = {
                 "shipment_id": shipment.shipment_id,
                 "failure_trace": shipment.agent_trace,
@@ -99,13 +140,33 @@ async def process_Waybill(file:UploadFile=File(...)):
                     
                 }
         
-        output ={k:getattr(shipment,k,"N/A") for k in keys_to_show}
+        output={}
+        for k in keys_to_show:
+            val = getattr(shipment, k, "N/A")
+
+            # Use your logic: convert NumPy types to Python types
+            if isinstance(val, (np.float32, np.float64)):
+                val = float(val)
+            elif isinstance(val, (np.int32, np.int64)):
+                val = int(val)
+            elif isinstance(val, datetime):
+                val = val.isoformat()
+                
+            output[k] = val
+    
         output["status"]="SUCCESS" if shipment.is_verified else "Failed"
+        output["metrics"] = {
+            "latency_sec": round(latency, 2),
+            "current_window_drift": f"{round(ov_rate, 2)}%",
+            "current_window_failure": f"{round(fail_rate, 2)}%"
+        }
         return output
     
     except  Exception as e:
-        raise HTTPException(status_code=500,detail=str(e))
-
+        with mlflow.start_run(run_name="API_CRASH"):
+            mlflow.log_param("error", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+        
 if __name__=="__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 

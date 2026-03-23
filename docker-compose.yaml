@@ -18,3 +18,20 @@ services:
     image: "redis:alpine"
     ports:
       - "6379:6379"
+
+  mlflow_server:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow_service
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+    environment:
+      MLFLOW_SERVER_ALLOWED_HOSTS: "mlflow_server:5000,mlflow_server,localhost:5000,localhost,127.0.0.1:5000,127.0.0.1"
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:///mlflow.db
+      --default-artifact-root /mlflow/mlruns
+      --host 0.0.0.0
+      --port 5000
+      --allowed-hosts "mlflow_server:5000,mlflow_server,localhost:5000,localhost,127.0.0.1:5000,127.0.0.1"

@@ -85,7 +85,8 @@ def test_critic_corrects_insane_pricing(critic_agent):
         day_of_week=1,
         is_holiday=False,
         duration_min=15.0,
-        traffic_density_score=1.0
+        traffic_density_score=1.0,
+        extraction_attempts=0,
     )
 
     # 2. ACT
