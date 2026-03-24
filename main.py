@@ -16,7 +16,7 @@ import numpy as np
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI","http://localhost:5000")
 if MLFLOW_TRACKING_URI != "local":
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-
+mlflow.set_experiment("Logistics_Pricing")
 def extract_text(pdf_path):
         """Utility to turn the PDF file into a string the LLM can read"""
         doc = fitz.open(pdf_path)
@@ -54,11 +54,12 @@ if __name__=="__main__":
     stats_for_metrics = []
     all_shipment_data=[]
     all_audit_traces={}
-    mlflow.set_experiment("Logistics_Pricing")
+
     
     # 2. Build the Graph
     with mlflow.start_run(run_name="7_Waybill_Stress_Test"):
         app = create_logisticsgraph(doc_agent, route_agent, pricing_agent, critic_agent)
+        print("strated")
        
         if not pdf_files:
             print(f"No files found in {input_path}")
