@@ -67,13 +67,30 @@ Deterministic Validation- Developed a math-based Critic to bypass LLM latency fo
 
 
 Currently working on:
-1)Batching Logic (Current Focus): Developing a Batching Agent to group shipments within 1km/1hr windows to optimize costs.
+Technical and System Evolution-
+1. Intelligent Logistics Consolidation (Batching Agent)
+Problem: High operational "Empty Mile" costs and redundant labor for geographically clustered deliveries.
 
-2)Improving latency
+Solution: Implementing a Spatial-Temporal Batching Agent. This component intercepts incoming shipment streams to identify "Neighbors" (within a 1km/1hr window).
 
-3) Dynamic Feedback Loops: Currently utilizing a high-performance deterministic Critic (Python/Math) for sub-10ms validation.  will introduce an SLM-based (Phi-3) Reflection Agent to handle nuanced, non-deterministic errors that pure logic cannot catch (e.g., verifying if 'Fragile' handling instructions were correctly interpreted).
+Impact: Merges individual requests into high-density "Milk Runs," reducing fuel consumption and increasing the Net Margin per vehicle by an estimated 30-40%.
 
-4)Full CD Pipeline: Automated deployment to AWS ECS with integrated Canary releases.
+2. Latency Optimization & Edge Performance
+Focus: Reducing the "Time-to-Quote" for real-time logistics.
+
+3. Hybrid Verification: Deterministic Critic + SLM Reflection
+Architecture: Moving beyond simple validation to a Dual-Layer Guardrail system.
+
+Layer 1 (Deterministic): A high-performance Python-based Critic for sub-10ms math and constraint validation.
+
+Layer 2 (Cognitive): Integrating a Small Language Model (SLM)—specifically Phi-3—as a Reflection Agent. This agent handles "Soft Logic" that math cannot catch, such as verifying specialized handling instructions (e.g., "Fragile," "Keep Upright") and cross-referencing them with the selected vehicle's capabilities.
+
+4. Enterprise-Grade CI/CD & Reliability
+Infrastructure: Transitioning to a Full CD Pipeline with Infrastructure as Code (IaC).
+
+Deployment: Automated container orchestration on AWS ECS.
+
+Safety: Implementing Canary Releases, allowing the system to test new agentic logic on 5% of traffic before a full rollout, ensuring 99.9% uptime during model or logic updates.
 
 🚀 Getting Started
 1. Prerequisites
