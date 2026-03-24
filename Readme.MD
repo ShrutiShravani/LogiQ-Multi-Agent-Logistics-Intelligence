@@ -27,25 +27,26 @@ Audit Coverage	100%	MLflow Experiment Logs
 
 
 🌟 Engineering Highlights
-Actor-Critic Reflection: Implemented a Deterministic Critic Agent that performs mathematical validation (zero-weight checks, parcel count verification). It triggers targeted re-extraction loops, reducing human intervention by 80%.
 
-Human-in-the-Loop (HITL) Triggers: If the system fails to validate a document after 3 attempts, it raises a DataValidationError and routes the shipment to a manual audit queue, preventing infinite loops.
+-Actor-Critic Reflection: Implemented a Deterministic Critic Agent that performs mathematical validation (zero-weight checks, parcel count verification). It triggers targeted re-extraction loops, reducing human intervention by 80%.
 
-Predictive Pricing Engine: A custom XGBoost regressor predicts base costs, adjusted by an asynchronous Pricing Agent considering Weather (Visual Crossing) and Traffic (Mapbox).
+-Human-in-the-Loop (HITL) Triggers: If the system fails to validate a document after 3 attempts, it raises a DataValidationError and routes the shipment to a manual audit queue, preventing infinite loops.
 
-Resiliency Patterns:
+-Predictive Pricing Engine: A custom XGBoost regressor predicts base costs, adjusted by an asynchronous Pricing Agent considering Weather (Visual Crossing) and Traffic (Mapbox).
 
-Circuit Breakers: If the Mapbox API is unreachable, the system triggers a Haversine/Manhattan fallback to ensure 100% uptime.
+-Resiliency Patterns:
 
-Dead Letter Queues (DLQ): Corrupted or unparseable waybills are isolated for manual inspection.
+1)Circuit Breakers: If the Mapbox API is unreachable, the system triggers a Haversine/Manhattan fallback to ensure 100% uptime.
 
-Performance Optimization:
+2)Dead Letter Queues (DLQ): Corrupted or unparseable waybills are isolated for manual inspection.
 
+3)Performance Optimization:
 Geocoding Cache: Uses Redis to store recurring coordinates (e.g., ports/airports), slashing RTT and API costs.
 
 Latency Budgets: Automated fallback execution if the RouteAgent exceeds its 2-second processing window.
 
-🛠️ Tech Stack & Infrastructure
+🛠️ Tech Stack & Infrastructure-
+
 Core: Python 3.11, FastAPI, Pydantic, LangGraph
 
 Intelligence: XGBoost, NumPy, Pandas, OpenAI
@@ -57,15 +58,21 @@ Observability: LangSmith (Trace/Cost), MLflow (Audit Trail/Versioning)
 
 
 Challenges faced:
+
 API Instability- Implemented Circuit Breakers and Manhattan Distance fallbacks.
+
 DNS Rebinding- Configured MLFLOW_HTTP_HOST_ALLOW_LIST for secure internal container communication.
+
 Deterministic Validation- Developed a math-based Critic to bypass LLM latency for basic logic checks.
 
 
 Currently working on:
 1)Batching Logic (Current Focus): Developing a Batching Agent to group shipments within 1km/1hr windows to optimize costs.
+
 2)Improving latency
+
 3) Dynamic Feedback Loops: Currently utilizing a high-performance deterministic Critic (Python/Math) for sub-10ms validation.  will introduce an SLM-based (Phi-3) Reflection Agent to handle nuanced, non-deterministic errors that pure logic cannot catch (e.g., verifying if 'Fragile' handling instructions were correctly interpreted).
+
 4)Full CD Pipeline: Automated deployment to AWS ECS with integrated Canary releases.
 
 🚀 Getting Started
