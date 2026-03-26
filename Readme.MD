@@ -1,8 +1,10 @@
 🚚 LogiQ — Multi-Agent Logistics Intelligence Platform
 
+
 LogiQ is a production-grade multi-agent orchestration system designed to automate industrial logistics workflows — from document ingestion to pricing and validation.
 
 It ensures data integrity and pricing accuracy using a self-correcting Actor–Critic architecture, preventing incorrect shipments before financial commitment.
+
 
 ❓Why LogiQ?
 
@@ -17,12 +19,15 @@ multi-agent orchestration
 deterministic + AI validation loops
 real-time pricing intelligence
 
+
 🏗️ System Architecture
 
 graph TD 
 A[FastAPI Ingestion] --> B{Supervisor}
 B --> C[Document Agent: Extraction] D -- "Success" --> E[Route Agent: Mapping] E --> F[Pricing Agent: XGBoost] F --> G[Critic Agent: Validation] G -- "Invalid (e.g. 0kg)" --> B 
 F --> G[MLflow & LangSmith: Telemetry] G --> H[PostgreSQL: Persistence]
+
+
 
 ⚙️ Core Design Decisions
 
@@ -35,6 +40,7 @@ routing
 pricing
 validation
 
+
 👉 Instead of one LLM:
 
 we split responsibilities into agents orchestrated via LangGraph DAG
@@ -42,6 +48,7 @@ This enables:
 modular design
 retry loops
 stateful execution
+
 
 🔹2.Why Actor–Critic Architecture?
 
@@ -60,28 +67,35 @@ route validity
 
 👉 If invalid → system retries automatically
 
+
 🔹 3. Why XGBoost for Pricing?
 
 LLMs are not ideal for numerical prediction.
 
 👉 XGBoost was chosen because:
+
 strong performance on tabular logistics data
 interpretable pricing logic
 low latency for real-time quotes
 
+
 🔹 4. Why Redis (Caching)?
+
 Geocoding APIs are:
 expensive
 slow
 
 👉 Redis cache:
+
 stores frequent locations (ports, warehouses)
 reduces API calls
 improves latency
 
+
 🔹 5. Why PostgreSQL (State)?
 
 Logistics workflows require:
+
 persistence
 audit trails
 
@@ -93,34 +107,44 @@ debugging
 
 🔍 Key Capabilities
 
+
 🔸 Self-Correcting Validation Loop
 
 Critic detects invalid outputs
 triggers targeted re-extraction
 reduces manual intervention by ~80%
 
+
 🔸 Predictive Pricing Engine
 
 XGBoost model predicts base cost
 
 adjusted using:
+
 🌦 Weather (Visual Crossing)
 🚦 Traffic (Mapbox)
+
 
 🔸 Resiliency & Reliability
 
 ✅ Circuit Breakers
+
 fallback to Haversine distance if API fails
 ✅ Dead Letter Queue (DLQ)
+
 isolates corrupted waybills
 ✅ Latency Budgeting
+
 fallback triggered if agent exceeds time threshold
+
 
 🔸 Performance Optimization
 
 Redis geocoding cache → reduced RTT
 batching strategies → improved route efficiency
 supports high-throughput logistics pipelines
+
+
 
 📊 Benchmarks (Golden Set)
 
@@ -133,10 +157,14 @@ supports high-throughput logistics pipelines
 | Manual Intervention Reduction | **~80%**               |
 
 
+
+
 🧪 Observability
 
 LangSmith → trace & cost monitoring
 MLflow → experiment tracking & audit logs
+
+
 
 🏗️ Tech Stack
 
@@ -155,6 +183,8 @@ Redis (caching)
 MLflow
 LangSmith
 
+
+
 ⚠️ Challenges & Solutions-
 
 🔹 API Instability:
@@ -171,6 +201,7 @@ Solution: Python-based Critic → sub-ms validation
 
 Problem: DNS rebinding error in containers
 Solution: Configured MLFLOW_HTTP_HOST_ALLOW_LIST
+
 
 
 🚀 Ongoing Work
@@ -191,6 +222,7 @@ Layer 2: SLM (Phi-3) reflection
 AWS ECS deployment
 Canary releases (5% traffic testing)
 target 99.9% uptime
+
 
 🚀 Getting Started
 
