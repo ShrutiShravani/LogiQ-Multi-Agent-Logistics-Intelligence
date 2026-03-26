@@ -166,11 +166,12 @@ Canary releases (5% traffic testing)
 target 99.9% uptime
 
 🚀 Getting Started
+
 1. Prerequisites
 •	Docker & Docker Compose
 •	OpenAI API Key (for document proecssing)
 
-2.How to run:
+ 2.How to run:
 # Clone the repository
 git clone https://github.com/yourusername/logiq-agent-ops.git
 cd logiq-agent-ops
