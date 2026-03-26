@@ -6,7 +6,9 @@ LogiQ is a multi-agent orchestration platform that automates end-to-end logistic
 
 It introduces a self-correcting Actor–Critic architecture to ensure zero-invalid shipments before financial commitment, solving one of the most critical failure points in logistics systems.
 
-Problem
+
+
+Problem-
 
 Modern logistics systems suffer from:
 
@@ -17,7 +19,9 @@ costly downstream failures
 
 Even a single incorrect shipment can lead to financial loss, SLA violations, and operational inefficiencies.
 
-Solution
+
+
+Solution-
 
 LogiQ replaces brittle pipelines with a multi-agent, self-correcting system:
 
@@ -28,7 +32,9 @@ integrates ML + rules for reliable decision-making
 
 Result: high accuracy, lower cost, and production reliability
 
-Architecture Overview
+
+Architecture Overview-
+
 
 graph TD 
 A[FastAPI Ingestion] --> B{Supervisor}
@@ -41,7 +47,9 @@ G -- "Invalid (e.g. 0kg)" --> B
 F --> I[MLflow & LangSmith: Telemetry]
 G --> H[PostgreSQL: Persistence]
 
-Core Design Decisions
+
+
+Core Design Decisions-
 
 1. Why Multi-Agent (LangGraph)?
 
@@ -119,7 +127,8 @@ reproducibility
 debugging
 
 
-Key Innovations
+
+Key Innovations-
 
 1. Actor–Critic Validation Loop
 
@@ -157,6 +166,7 @@ Benefits:
 modular system design
 fault isolation
 scalable workflows
+
 3. Hybrid Intelligence (ML + Systems)
 
 LogiQ combines:
@@ -185,6 +195,7 @@ accurate and explainable pricing
 low-latency predictions
 
 5. High-Performance Infrastructure
+
 Redis caching → reduces geocoding latency
 PostgreSQL → persistent state and auditability
 asynchronous agent execution → improved throughput
@@ -208,6 +219,8 @@ batching route computations
 optimized for high-throughput pipelines
 
 
+
+
 Benchmarks
 
 | Metric                        | Value              |
@@ -219,15 +232,17 @@ Benchmarks
 | Manual Intervention Reduction | ~80%               |
 
 
+
 Observability
 
 LangSmith → tracing, debugging, cost monitoring
 MLflow → experiment tracking and audit logs
 
-
+Enables:
 full system visibility
 reproducible pipelines
 production debugging
+
 
 
 Tech Stack
@@ -248,6 +263,8 @@ MLflow
 LangSmith
 
 
+
+
 Challenges and Engineering Decisions
 
 API Reliability-
@@ -265,6 +282,8 @@ Distributed System Issues-
 Problem: MLflow DNS rebinding in containers
 Solution: configured host allowlist
 
+
+
 Currently Working On/ Optimizations Sprint-
 
 Spatial-Temporal Optimization
@@ -280,6 +299,9 @@ Production Deployment
 AWS ECS deployment
 canary releases (5% traffic)
 target: 99.9% uptime
+
+
+
 
 🚀 Getting Started
 
