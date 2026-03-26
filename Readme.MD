@@ -1,96 +1,165 @@
-🚚 LogiQ: Multi-Agent Logistics Intelligence Platform
-LogiQ is a high-performance orchestration platform designed to automate the lifecycle of industrial logistics. By utilizing a Senior-level Actor-Critic architecture, the system ensures data integrity and pricing accuracy through iterative reflection loops before any financial commitments are recorded.
+🚚 LogiQ — Multi-Agent Logistics Intelligence Platform
+LogiQ is a production-grade multi-agent orchestration system designed to automate industrial logistics workflows — from document ingestion to pricing and validation.
 
-🏗️ System Architecture & Workflow
-Using LangGraph, the system coordinates specialized agents in a stateful directed acyclic graph (DAG). Below is the logic flow:
-<<<<<<< HEAD
+It ensures data integrity and pricing accuracy using a self-correcting Actor–Critic architecture, preventing incorrect shipments before financial commitment.
 
-Code snippet
-graph TD
-    A[FastAPI Ingestion] --> B{Supervisor}
-    B --> C[Document Agent: Extraction]
-    D -- "Success" --> E[Route Agent: Mapping]
-    E --> F[Pricing Agent: XGBoost]
-    F --> G[Critic Agent: Validation]
-    G -- "Invalid (e.g. 0kg)" --> B
-    F --> G[MLflow & LangSmith: Telemetry]
-    G --> H[PostgreSQL: Persistence]
+❓Why LogiQ?
+Traditional logistics systems:
+rely on manual validation ❌
+are error-prone (wrong weight, route, cost) ❌
+lack real-time intelligence ❌
 
-🏆 System Benchmarks (The "Golden Set")
-Validated against a controlled 'Golden Set' of 6 multi-format complex waybill PDFs.
+👉 LogiQ solves this using:
+multi-agent orchestration
+deterministic + AI validation loops
+real-time pricing intelligence
 
-Metric	Value	Tech Source
-End-to-end Latency	9s (p99)	LangSmith Trace
-Extraction Accuracy	96%	Critic Agent Feedback
-Token Cost	~$0.0001 / req	GPT-4o-mini
-Audit Coverage	100%	MLflow Experiment Logs
+🏗️ System Architecture
+
+⚙️ Core Design Decisions
+🔹 1. Why Multi-Agent (LangGraph)?
+
+Logistics workflows involve:
+document parsing
+routing
+pricing
+validation
+
+👉 Instead of one LLM:
+
+we split responsibilities into agents orchestrated via LangGraph DAG
+This enables:
+modular design
+retry loops
+stateful execution
+
+🔹 2.Why Actor–Critic Architecture?
+
+LLMs alone are unreliable for critical decisions.
+
+👉 We introduced:
+
+Actor → performs task (extract, price)
+Critic → validates output deterministically
+
+Critic checks:
+
+weight ≠ 0
+parcel count consistency
+route validity
+
+👉 If invalid → system retries automatically
+
+🔹 3. Why XGBoost for Pricing?
+
+LLMs are not ideal for numerical prediction.
+👉 XGBoost was chosen because:
+strong performance on tabular logistics data
+interpretable pricing logic
+low latency for real-time quotes
+
+🔹 4. Why Redis (Caching)?
+Geocoding APIs are:
+expensive
+slow
+
+👉 Redis cache:
+stores frequent locations (ports, warehouses)
+reduces API calls
+improves latency
+
+🔹 5. Why PostgreSQL (State)?
+Logistics workflows require:
+persistence
+audit trails
+
+👉 PostgreSQL enables:
+shipment state tracking
+reproducibility
+debugging
+
+🔍 Key Capabilities
+🔸 Self-Correcting Validation Loop
+Critic detects invalid outputs
+triggers targeted re-extraction
+reduces manual intervention by ~80%
+
+🔸 Predictive Pricing Engine
+XGBoost model predicts base cost
+adjusted using:
+🌦 Weather (Visual Crossing)
+🚦 Traffic (Mapbox)
+
+🔸 Resiliency & Reliability
+✅ Circuit Breakers
+fallback to Haversine distance if API fails
+✅ Dead Letter Queue (DLQ)
+isolates corrupted waybills
+✅ Latency Budgeting
+fallback triggered if agent exceeds time threshold
+
+🔸 Performance Optimization
+Redis geocoding cache → reduced RTT
+batching strategies → improved route efficiency
+supports high-throughput logistics pipelines
+
+📊 Benchmarks (Golden Set)
+
+| Metric                        | Value                  |
+| ----------------------------- | ---------------------- |
+| Extraction Accuracy           | **96%**                |
+| Latency (p99)                 | **~9s**                |
+| Token Cost                    | **~$0.0001 / request** |
+| Audit Coverage                | **100%**               |
+| Manual Intervention Reduction | **~80%**               |
 
 
-🌟 Engineering Highlights
+🧪 Observability
+LangSmith → trace & cost monitoring
+MLflow → experiment tracking & audit logs
 
--Actor-Critic Reflection: Implemented a Deterministic Critic Agent that performs mathematical validation (zero-weight checks, parcel count verification). It triggers targeted re-extraction loops, reducing human intervention by 80%.
+🏗️ Tech Stack
+🧠 AI / Intelligence
+LangGraph (multi-agent orchestration)
+XGBoost (pricing)
+OpenAI models
+⚙️ Backend
+FastAPI
+Python 3.11
+📦 Infrastructure
+Docker
+PostgreSQL (state)
+Redis (caching)
+📊 Observability
+MLflow
+LangSmith
 
--Human-in-the-Loop (HITL) Triggers: If the system fails to validate a document after 3 attempts, it raises a DataValidationError and routes the shipment to a manual audit queue, preventing infinite loops.
+⚠️ Challenges & Solutions-
+🔹 API Instability:
+Problem: Mapbox failures
+Solution: Haversine fallback → ensured 100% uptime
 
--Predictive Pricing Engine: A custom XGBoost regressor predicts base costs, adjusted by an asynchronous Pricing Agent considering Weather (Visual Crossing) and Traffic (Mapbox).
+🔹 Deterministic Validation:
+Problem: LLM errors in numeric logic
+Solution: Python-based Critic → sub-ms validation
 
--Resiliency Patterns:
-
-1)Circuit Breakers: If the Mapbox API is unreachable, the system triggers a Haversine/Manhattan fallback to ensure 100% uptime.
-
-2)Dead Letter Queues (DLQ): Corrupted or unparseable waybills are isolated for manual inspection.
-
-3)Performance Optimization:
-Geocoding Cache: Uses Redis to store recurring coordinates (e.g., ports/airports), slashing RTT and API costs.
-
-Latency Budgets: Automated fallback execution if the RouteAgent exceeds its 2-second processing window.
-
-🛠️ Tech Stack & Infrastructure-
-
-Core: Python 3.11, FastAPI, Pydantic, LangGraph
-
-Intelligence: XGBoost, NumPy, Pandas, OpenAI
-
-Infrastructure: Docker Compose, PostgreSQL (Permanent State), Redis (Caching)
-
-Observability: LangSmith (Trace/Cost), MLflow (Audit Trail/Versioning)
-=======
-
-
-Challenges faced:
-
-API Instability- Implemented Circuit Breakers and Manhattan Distance fallbacks.
-
-DNS Rebinding- Configured MLFLOW_HTTP_HOST_ALLOW_LIST for secure internal container communication.
-
-Deterministic Validation- Developed a math-based Critic to bypass LLM latency for basic logic checks.
+🔹 MLflow Networking Issue:
+Problem: DNS rebinding error in containers
+Solution: Configured MLFLOW_HTTP_HOST_ALLOW_LIST
 
 
-Currently working on:
-Technical and System Evolution-
-1. Intelligent Logistics Consolidation (Batching Agent)
-Problem: High operational "Empty Mile" costs and redundant labor for geographically clustered deliveries.
-
-Solution: Implementing a Spatial-Temporal Batching Agent. This component intercepts incoming shipment streams to identify "Neighbors" (within a 1km/1hr window).
-
-Impact: Merges individual requests into high-density "Milk Runs," reducing fuel consumption and increasing the Net Margin per vehicle by an estimated 30-40%.
-
-2. Latency Optimization & Edge Performance
-Focus: Reducing the "Time-to-Quote" for real-time logistics.
-
-3. Hybrid Verification: Deterministic Critic + SLM Reflection
-Architecture: Moving beyond simple validation to a Dual-Layer Guardrail system.
-
-Layer 1 (Deterministic): A high-performance Python-based Critic for sub-10ms math and constraint validation.
-
-Layer 2 (Cognitive): Integrating a Small Language Model (SLM)—specifically Phi-3—as a Reflection Agent. This agent handles "Soft Logic" that math cannot catch, such as verifying specialized handling instructions (e.g., "Fragile," "Keep Upright") and cross-referencing them with the selected vehicle's capabilities.
-
-4. Enterprise-Grade CI/CD & Reliability
-Infrastructure: Transitioning to a Full CD Pipeline with Infrastructure as Code (IaC).
-
-Deployment: Automated container orchestration on AWS ECS.
-
-Safety: Implementing Canary Releases, allowing the system to test new agentic logic on 5% of traffic before a full rollout, ensuring 99.9% uptime during model or logic updates.
+🚀 Ongoing Work
+🔹 Spatial-Temporal Batching Agent
+groups nearby shipments (1km / 1hr window)
+enables “Milk Runs”
+improves margins by ~30–40%
+🔹 Hybrid Validation (Next Gen)
+Layer 1: deterministic critic
+Layer 2: SLM (Phi-3) reflection
+🔹 CI/CD & Deployment
+AWS ECS deployment
+Canary releases (5% traffic testing)
+target 99.9% uptime
 
 🚀 Getting Started
 1. Prerequisites
