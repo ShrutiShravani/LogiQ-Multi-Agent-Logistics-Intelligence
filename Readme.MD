@@ -169,6 +169,7 @@ Why this matters:
 
 avoids LLM hallucination in critical paths
 ensures reliability in production
+
 4. Real-Time Pricing Engine
 
 Pricing is computed using:
@@ -190,18 +191,18 @@ asynchronous agent execution → improved throughput
 
 System Capabilities
 
-Self-Correcting Execution
+Self-Correcting Execution-
 automatic retries on validation failure
 targeted reprocessing instead of full restart
 
-Resiliency Engineering
+Resiliency Engineering-
 
 circuit breakers for API failures
 Haversine fallback for routing
 dead letter queue for corrupted inputs
 latency-based fallback triggers
 
-Performance Optimization
+Performance Optimization-
 caching frequently used geolocations
 batching route computations
 optimized for high-throughput pipelines
@@ -217,8 +218,6 @@ Benchmarks
 | Audit Coverage                | 100%               |
 | Manual Intervention Reduction | ~80%               |
 
-
-Enables:
 
 Observability
 
@@ -251,22 +250,22 @@ LangSmith
 
 Challenges and Engineering Decisions
 
-API Reliability
+API Reliability-
 
 Problem: external API failures (Mapbox)
 Solution: fallback to Haversine distance → ensured 100% uptime
 
-LLM Reliability
+LLM Reliability-
 
 Problem: incorrect numerical outputs
 Solution: deterministic Critic layer → sub-millisecond validation
 
-Distributed System Issues
+Distributed System Issues-
 
 Problem: MLflow DNS rebinding in containers
 Solution: configured host allowlist
 
-Currnetly Working On/ Optimzations-
+Currently Working On/ Optimizations Sprint-
 
 Spatial-Temporal Optimization
 cluster shipments within 1 km / 1 hour windows
