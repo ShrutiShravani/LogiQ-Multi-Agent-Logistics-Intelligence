@@ -21,8 +21,8 @@ B --> C[Document Agent: Extraction] D -- "Success" --> E[Route Agent: Mapping] E
 F --> G[MLflow & LangSmith: Telemetry] G --> H[PostgreSQL: Persistence]
 
 ⚙️ Core Design Decisions
-🔹 1. Why Multi-Agent (LangGraph)?
 
+🔹 1. Why Multi-Agent (LangGraph)?
 Logistics workflows involve:
 document parsing
 routing
@@ -30,15 +30,13 @@ pricing
 validation
 
 👉 Instead of one LLM:
-
 we split responsibilities into agents orchestrated via LangGraph DAG
 This enables:
 modular design
 retry loops
 stateful execution
 
-🔹 2.Why Actor–Critic Architecture?
-
+🔹2.Why Actor–Critic Architecture?
 LLMs alone are unreliable for critical decisions.
 
 👉 We introduced:
@@ -55,7 +53,6 @@ route validity
 👉 If invalid → system retries automatically
 
 🔹 3. Why XGBoost for Pricing?
-
 LLMs are not ideal for numerical prediction.
 👉 XGBoost was chosen because:
 strong performance on tabular logistics data
