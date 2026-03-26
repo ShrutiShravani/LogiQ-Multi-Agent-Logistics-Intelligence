@@ -1,20 +1,24 @@
 🚚 LogiQ — Multi-Agent Logistics Intelligence Platform
+
 LogiQ is a production-grade multi-agent orchestration system designed to automate industrial logistics workflows — from document ingestion to pricing and validation.
 
 It ensures data integrity and pricing accuracy using a self-correcting Actor–Critic architecture, preventing incorrect shipments before financial commitment.
 
 ❓Why LogiQ?
+
 Traditional logistics systems:
 rely on manual validation ❌
 are error-prone (wrong weight, route, cost) ❌
 lack real-time intelligence ❌
 
 👉 LogiQ solves this using:
+
 multi-agent orchestration
 deterministic + AI validation loops
 real-time pricing intelligence
 
 🏗️ System Architecture
+
 graph TD 
 A[FastAPI Ingestion] --> B{Supervisor}
 B --> C[Document Agent: Extraction] D -- "Success" --> E[Route Agent: Mapping] E --> F[Pricing Agent: XGBoost] F --> G[Critic Agent: Validation] G -- "Invalid (e.g. 0kg)" --> B 
@@ -23,13 +27,16 @@ F --> G[MLflow & LangSmith: Telemetry] G --> H[PostgreSQL: Persistence]
 ⚙️ Core Design Decisions
 
 🔹 1. Why Multi-Agent (LangGraph)?
+
 Logistics workflows involve:
+
 document parsing
 routing
 pricing
 validation
 
 👉 Instead of one LLM:
+
 we split responsibilities into agents orchestrated via LangGraph DAG
 This enables:
 modular design
@@ -37,6 +44,7 @@ retry loops
 stateful execution
 
 🔹2.Why Actor–Critic Architecture?
+
 LLMs alone are unreliable for critical decisions.
 
 👉 We introduced:
@@ -53,7 +61,9 @@ route validity
 👉 If invalid → system retries automatically
 
 🔹 3. Why XGBoost for Pricing?
+
 LLMs are not ideal for numerical prediction.
+
 👉 XGBoost was chosen because:
 strong performance on tabular logistics data
 interpretable pricing logic
@@ -70,28 +80,35 @@ reduces API calls
 improves latency
 
 🔹 5. Why PostgreSQL (State)?
+
 Logistics workflows require:
 persistence
 audit trails
 
 👉 PostgreSQL enables:
+
 shipment state tracking
 reproducibility
 debugging
 
 🔍 Key Capabilities
+
 🔸 Self-Correcting Validation Loop
+
 Critic detects invalid outputs
 triggers targeted re-extraction
 reduces manual intervention by ~80%
 
 🔸 Predictive Pricing Engine
+
 XGBoost model predicts base cost
+
 adjusted using:
 🌦 Weather (Visual Crossing)
 🚦 Traffic (Mapbox)
 
 🔸 Resiliency & Reliability
+
 ✅ Circuit Breakers
 fallback to Haversine distance if API fails
 ✅ Dead Letter Queue (DLQ)
@@ -100,6 +117,7 @@ isolates corrupted waybills
 fallback triggered if agent exceeds time threshold
 
 🔸 Performance Optimization
+
 Redis geocoding cache → reduced RTT
 batching strategies → improved route efficiency
 supports high-throughput logistics pipelines
@@ -116,10 +134,12 @@ supports high-throughput logistics pipelines
 
 
 🧪 Observability
+
 LangSmith → trace & cost monitoring
 MLflow → experiment tracking & audit logs
 
 🏗️ Tech Stack
+
 🧠 AI / Intelligence
 LangGraph (multi-agent orchestration)
 XGBoost (pricing)
@@ -136,28 +156,38 @@ MLflow
 LangSmith
 
 ⚠️ Challenges & Solutions-
+
 🔹 API Instability:
+
 Problem: Mapbox failures
 Solution: Haversine fallback → ensured 100% uptime
 
 🔹 Deterministic Validation:
+
 Problem: LLM errors in numeric logic
 Solution: Python-based Critic → sub-ms validation
 
 🔹 MLflow Networking Issue:
+
 Problem: DNS rebinding error in containers
 Solution: Configured MLFLOW_HTTP_HOST_ALLOW_LIST
 
 
 🚀 Ongoing Work
+
 🔹 Spatial-Temporal Batching Agent
+
 groups nearby shipments (1km / 1hr window)
 enables “Milk Runs”
 improves margins by ~30–40%
+
 🔹 Hybrid Validation (Next Gen)
+
 Layer 1: deterministic critic
 Layer 2: SLM (Phi-3) reflection
+
 🔹 CI/CD & Deployment
+
 AWS ECS deployment
 Canary releases (5% traffic testing)
 target 99.9% uptime
