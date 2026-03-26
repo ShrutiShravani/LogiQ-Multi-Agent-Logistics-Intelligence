@@ -15,6 +15,10 @@ deterministic + AI validation loops
 real-time pricing intelligence
 
 🏗️ System Architecture
+graph TD 
+A[FastAPI Ingestion] --> B{Supervisor}
+B --> C[Document Agent: Extraction] D -- "Success" --> E[Route Agent: Mapping] E --> F[Pricing Agent: XGBoost] F --> G[Critic Agent: Validation] G -- "Invalid (e.g. 0kg)" --> B 
+F --> G[MLflow & LangSmith: Telemetry] G --> H[PostgreSQL: Persistence]
 
 ⚙️ Core Design Decisions
 🔹 1. Why Multi-Agent (LangGraph)?
