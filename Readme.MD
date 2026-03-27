@@ -299,6 +299,7 @@ Production Deployment
 AWS ECS deployment
 canary releases (5% traffic)
 target: 99.9% uptime
+reduce latency
 
 
 
