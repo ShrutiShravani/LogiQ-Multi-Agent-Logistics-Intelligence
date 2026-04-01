@@ -294,24 +294,20 @@ Enables:
 
 Tech Stack
 
+
 AI / LLM:
-
-
 LangGraph, LangChain, Phi-3
 
 
 Machine Learning:
-
 XGBoost
 
 
 Backend & Infra:
-
 FastAPI, Redis, PostgreSQL, Docker
 
 
 Evaluation:
-
 MLflow, LangSmith
 
 
@@ -319,37 +315,52 @@ MLflow, LangSmith
 Challenges and Engineering Decisions:
 
 
+
 API Reliability-
+
 
 
 Problem: external API failures (Mapbox)
 
 
+
 Solution: fallback to Haversine distance → ensured 100% uptime
+
 
 
 LLM Reliability-
 
 
+
+
 Problem: incorrect numerical outputs
+
 
 
 Solution: deterministic Critic layer → sub-millisecond validation
 
 
+
 Distributed System Issues-
+
 
 
 Problem: MLflow DNS rebinding in containers
 
 
+
 Solution: configured host allowlist
+
 
 
 Example Workflow
 
 
+
+
 Input: Waybill / logistics request
+
+
 
 
 Output:
