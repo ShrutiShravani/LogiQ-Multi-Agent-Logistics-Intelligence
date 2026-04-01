@@ -83,61 +83,62 @@ Separation of concerns for reliability and scalability
 - Multi-stage validation pipeline:
 
 
-1) Schema validation (Pydantic)
+   1) Schema validation (Pydantic)
 
 
-2) Statistical anomaly detection (Z-score)
+   2) Statistical anomaly detection (Z-score)
 
 
-3) LLM-based expert validation (Phi-3)
-
-
-
-4) Guardrails using NeMo
-
-
-Prevents invalid or unsafe decisions (similar to fraud detection systems)
+   3) LLM-based expert validation (Phi-3)
 
 
 
-5). Efficiency & Cost Optimization (FinOps)
+4. Guardrails using NeMo
+
+
+   Prevents invalid or unsafe decisions (similar to fraud detection systems)
 
 
 
-- Spatial-temporal batching of logistics requests
+5. Efficiency & Cost Optimization (FinOps)
 
 
 
-- Reduces redundant API calls (routing/pricing)
+  - Spatial-temporal batching of logistics requests
 
 
 
-- Improves system throughput and cost efficiency
+   - Reduces redundant API calls (routing/pricing)
+
+
+
+   - Improves system throughput and cost efficiency
 
 
 5. Fault-Tolerant System Design
 
 
-- Redis caching
+    - Redis caching
 
-- Dead-letter queues
+    - Dead-letter queues
 
-- Circuit breakers
+   - Circuit breakers
 
-- Ensures system reliability under failure conditions
+    - Ensures system reliability under failure conditions
 
 
 
 6. Evaluation & Observability
 
 
-- MLflow → experiment tracking
+    - MLflow → experiment tracking
 
 
-- LangSmith → agent tracing
+    - LangSmith → agent tracing
 
 
-- Metrics: accuracy, latency, system performance
+    - Metrics: accuracy, latency, system performance
+
 
 
 
@@ -172,13 +173,17 @@ This enables:
 
 2. Why Actor–Critic Architecture?
 
+
 LLMs alone are unreliable for critical decisions.
 
 We introduced:
 
+
 - Actor → performs task (extract, price)
 
+
 - Critic → validates output deterministically
+
 
 - Critic checks:
 
@@ -191,16 +196,21 @@ We introduced:
   If invalid, the system retries automatically.
 
 
+
 3. Why XGBoost for Pricing?
+
 
 LLMs are not ideal for numerical prediction.
 
 
 XGBoost was chosen because:
 
+
 - strong performance on tabular logistics data
 
+
 - interpretable pricing logic
+
 
 - low latency for real-time quotes
 
@@ -210,9 +220,12 @@ XGBoost was chosen because:
 
 Geocoding APIs are:
 
-- expensive
 
-- slow
+ - expensive
+
+
+ - slow
+
 
 
 Redis cache:
@@ -232,17 +245,17 @@ Redis cache:
 
 Logistics workflows require:
 
-- persistence
+  - persistence
 
-- audit trails
+  - audit trails
 
 PostgreSQL enables:
 
-- shipment state tracking
+  - shipment state tracking
 
-- reproducibility
+  - reproducibility
 
-- debugging
+  - debugging
 
 
 
