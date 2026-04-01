@@ -20,17 +20,19 @@ Traditional logistics systems:
 
 ✅ LogiQ solves this using:
 
-multi-agent orchestration
+- multi-agent orchestration
 
-retrieval-augmented decision pipelines
+- retrieval-augmented decision pipelines
 
-trust & safety validation layers
+- trust & safety validation layers
 
-cost-aware system design
+- cost-aware system design
+
 
 
 
 Architecture Overview-
+
 
 
 graph TD 
@@ -49,70 +51,88 @@ G --> H[PostgreSQL: Persistence]
 
 
 
+
 ⚙️ Core Capabilities
+
 
 
 🧠 1. Multi-Agent Orchestration (LangGraph)
 
 
-Modular agents for routing, pricing, and validation
+- Modular agents for routing, pricing, and validation
 
-Stateful workflows with retry and correction loops
 
-Clean separation of responsibilities for scalability
+- Stateful workflows with retry and correction loops
+
+
+- Clean separation of responsibilities for scalability
 
 
 🔎 2. RAG-Based Data Processing
 
-Processes semi-structured logistics data
 
-Embedding + retrieval pipeline for contextual decisions
+- Processes semi-structured logistics data
 
 
-Structured outputs for downstream agents
+- Embedding + retrieval pipeline for contextual decisions
+
+
+- Structured outputs for downstream agents
 
 
 🛡️ 3. Trust & Safety (Defense-in-Depth)
 
 
-Multi-stage validation pipeline:
+- Multi-stage validation pipeline:
 
-Schema validation (Pydantic)
 
-Statistical anomaly detection (Z-score)
+- Schema validation (Pydantic)
 
-LLM-based expert validation (Phi-3)
+
+- Statistical anomaly detection (Z-score)
+
+
+- LLM-based expert validation (Phi-3)
+
 
 
 🔐 4. Guardrails (NeMo)
 
-Prevents unsafe or invalid outputs
+
+- Prevents unsafe or invalid outputs
 
 
-Ensures system reliability (similar to fraud detection systems)
+- Ensures system reliability (similar to fraud detection systems)
+
 
 
 ⚡ 5. Efficiency & Cost Optimization (FinOps)
 
 
-Spatial-temporal batching of logistics requests
+- Spatial-temporal batching of logistics requests
 
 
-Reduces redundant API calls (routing/pricing)
+- Reduces redundant API calls (routing/pricing)
 
 
-Improves throughput and cost efficiency
+- Improves throughput and cost efficiency
+
 
 
 🧱 6. Fault-Tolerant System Design
 
-Redis caching
 
-Dead-letter queues
+- Redis caching
 
-Circuit breakers
 
-Ensures high reliability under failure conditions
+- Dead-letter queues
+
+
+-Circuit breakers
+
+
+- Ensures high reliability under failure conditions
+
 
 
 📊 7. Evaluation & Observability
@@ -138,34 +158,45 @@ Metrics: accuracy, latency, system performance
 Logistics workflows involve:
 
 
-document parsing
-routing
-pricing
-validation
+- document parsing
+
+- routing
+
+- pricing
+
+- validation
+
 
 
 Instead of a single LLM, responsibilities are split into agents via a LangGraph DAG.
 
 
+
 ✅ Enables:
 
-modular design
 
-retry loops
+- modular design
 
-stateful execution
+
+- retry loops
+
+- stateful execution
+
 
 
 2. Why Actor–Critic Architecture?
 
-LLMs are unreliable for critical decisions.
+
+- LLMs are unreliable for critical decisions.
+
 
 We introduced:
 
-Actor → performs task (extract, price)
+
+- Actor → performs task (extract, price)
 
 
-Critic → validates output deterministically
+- Critic → validates output deterministically
 
 
 Critic checks:
@@ -188,52 +219,53 @@ LLMs are not ideal for numerical prediction.
 
 XGBoost provides:
 
-strong performance on tabular logistics data
+- strong performance on tabular logistics data
 
-interpretable pricing
+- interpretable pricing
 
-low latency
+- low latency
 
 
 4. Why Redis (Caching)?
 
 Geocoding APIs are:
 
-expensive
+- expensive
 
-slow
+- slow
 
 Redis:
 
-caches frequent locations
+- caches frequent locations
 
-reduces API calls
+- reduces API calls
 
-improves latency
+- improves latency
 
 
 5. Why PostgreSQL (State)?
 
 Logistics systems require:
 
-persistence
+- persistence
 
 
-auditability
+- auditability
 
 PostgreSQL enables:
 
-shipment tracking
+
+- shipment tracking
 
 
-reproducibility
+- reproducibility
 
 
-debugging
+- debugging
 
 
 
-Benchmarks
+📈 Benchmarks
 
 | Metric                        | Value              |
 | ----------------------------- | ------------------ |
@@ -244,39 +276,43 @@ Benchmarks
 
 
 
+
 🔍 Observability
 
+
 LangSmith → tracing, debugging, cost monitoring
+
 
 MLflow → experiment tracking
 
 Enables:
 
 
-full system visibility
+- full system visibility
 
-reproducibility
+- reproducibility
 
-production debugging
+- production debugging
+
 
 
 
 🧰 Tech Stack
 
 
-AI / LLM:
+- AI / LLM:
 LangGraph, LangChain, Phi-3
 
 
-Machine Learning:
+- Machine Learning:
 XGBoost
 
 
-Backend & Infra:
+- Backend & Infra:
 FastAPI, Redis, PostgreSQL, Docker
 
 
-Evaluation:
+- Evaluation:
 MLflow, LangSmith
 
 
@@ -302,6 +338,7 @@ Solution: Deterministic Critic layer → fast validation
 🧩 Distributed Systems
 
 
+
 Problem: MLflow DNS issues in containers
 
 
@@ -319,13 +356,16 @@ Input: Waybill / logistics request
 
 Output:
 
-structured shipment data
+- structured shipment data
 
-optimized route
 
-predicted pricing
+- optimized route
 
-validated decision
+
+- predicted pricing
+
+
+- validated decision
 
 
 
