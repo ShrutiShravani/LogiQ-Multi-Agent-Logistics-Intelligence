@@ -4,26 +4,45 @@ LogiQ is a production-grade multi-agent AI system designed to automate logistics
 
 It enables accurate, reliable, and cost-efficient decision-making in real-world logistics operations.
 
+
+
 Why LogiQ?
+
 
 Traditional logistics systems:
 
-rely on manual validation
-are error-prone (incorrect weight, route, cost)
-lack real-time intelligence
+
+- rely on manual validation
+
+- are error-prone (incorrect weight, route, cost)
+
+
+- lack real-time intelligence
+
+
 
 LogiQ solves this using:
 
-multi-agent orchestration
-retrieval-augmented decision pipelines
-trust & safety validation layers
-cost-aware system design
+
+-multi-agent orchestration
+
+
+-retrieval-augmented decision pipelines
+
+
+-trust & safety validation layers
+
+
+-cost-aware system design
+
 
 
 Architecture Overview-
 
 
 graph TD 
+
+
 A[FastAPI Ingestion] --> B{Supervisor}
 B --> C[Document Agent: Extraction]
 C --> D{Validation}
@@ -35,10 +54,12 @@ F --> I[MLflow & LangSmith: Telemetry]
 G --> H[PostgreSQL: Persistence]
 
 
-Core Capabilities
 
 
-1. Multi-Agent Orchestration (LangGraph)
+Core Capabilities:
+
+
+1. Multi-Agent Orchestration (LangGraph)-
 
 
 Modular agent design for routing, pricing, and validation
@@ -46,83 +67,107 @@ Stateful workflows with controlled retries and correction loops
 Separation of concerns for reliability and scalability
 
 
-2. RAG-Based Data Processing
+2. RAG-Based Data Processing-
 
 
-Processes semi-structured logistics data
-Embedding + retrieval pipeline for contextual decision-making
-Structured outputs for downstream agents
+- Processes semi-structured logistics data
+
+- Embedding + retrieval pipeline for contextual decision-making
+
+- Structured outputs for downstream agents
 
 
-3. Trust & Safety (Defense-in-Depth)
+3. Trust & Safety (Defense-in-Depth)-
 
-Multi-stage validation pipeline:
 
-Schema validation (Pydantic)
+- Multi-stage validation pipeline:
 
-Statistical anomaly detection (Z-score)
 
-LLM-based expert validation (Phi-3)
+1) Schema validation (Pydantic)
 
-Guardrails using NeMo
+
+2) Statistical anomaly detection (Z-score)
+
+
+3) LLM-based expert validation (Phi-3)
+
+
+
+4) Guardrails using NeMo
+
 
 Prevents invalid or unsafe decisions (similar to fraud detection systems)
 
-4. Efficiency & Cost Optimization (FinOps)
 
 
-Spatial-temporal batching of logistics requests
+5). Efficiency & Cost Optimization (FinOps)
 
-Reduces redundant API calls (routing/pricing)
 
-Improves system throughput and cost efficiency
+
+- Spatial-temporal batching of logistics requests
+
+
+
+- Reduces redundant API calls (routing/pricing)
+
+
+
+- Improves system throughput and cost efficiency
 
 
 5. Fault-Tolerant System Design
 
 
-Redis caching
+- Redis caching
 
-Dead-letter queues
+- Dead-letter queues
 
-Circuit breakers
+- Circuit breakers
 
-Ensures system reliability under failure conditions
+- Ensures system reliability under failure conditions
+
+
 
 6. Evaluation & Observability
 
-MLflow → experiment tracking
 
-LangSmith → agent tracing
+- MLflow → experiment tracking
 
-Metrics: accuracy, latency, system performance
+
+- LangSmith → agent tracing
+
+
+- Metrics: accuracy, latency, system performance
+
 
 
 Core Design Decisions-
+
 
 1. Why Multi-Agent (LangGraph)?
 
 Logistics workflows involve:
 
-document parsing
+- document parsing
 
-routing
+- routing
 
-pricing
+- pricing
 
-validation
+- validation
+
 
 Instead of one LLM:
-
 responsibilities are split into agents orchestrated via a LangGraph DAG
+
 
 This enables:
 
-modular design
+- modular design
 
-retry loops
+- retry loops
 
-stateful execution
+- stateful execution
 
 
 2. Why Actor–Critic Architecture?
@@ -131,65 +176,73 @@ LLMs alone are unreliable for critical decisions.
 
 We introduced:
 
-Actor → performs task (extract, price)
+- Actor → performs task (extract, price)
 
-Critic → validates output deterministically
+- Critic → validates output deterministically
 
-Critic checks:
+- Critic checks:
 
-weight ≠ 0
+   weight ≠ 0
 
-parcel count consistency
+   parcel count consistency
 
-route validity
+   route validity
 
-If invalid, the system retries automatically.
+  If invalid, the system retries automatically.
+
 
 3. Why XGBoost for Pricing?
 
 LLMs are not ideal for numerical prediction.
 
+
 XGBoost was chosen because:
 
-strong performance on tabular logistics data
+- strong performance on tabular logistics data
 
-interpretable pricing logic
+- interpretable pricing logic
 
-low latency for real-time quotes
+- low latency for real-time quotes
 
 
 4. Why Redis (Caching)?
 
+
 Geocoding APIs are:
 
-expensive
+- expensive
 
-slow
+- slow
+
 
 Redis cache:
 
-stores frequent locations (ports, warehouses)
 
-reduces API calls
+- stores frequent locations (ports, warehouses)
 
-improves latency
+
+- reduces API calls
+
+
+- improves latency
 
 
 5. Why PostgreSQL (State)?
 
+
 Logistics workflows require:
 
-persistence
+- persistence
 
-audit trails
+- audit trails
 
 PostgreSQL enables:
 
-shipment state tracking
+- shipment state tracking
 
-reproducibility
+- reproducibility
 
-debugging
+- debugging
 
 
 
@@ -204,19 +257,25 @@ Benchmarks
 
 
 
-Observability
+Observability:
+
 
 LangSmith → tracing, debugging, cost monitoring
 
+
 MLflow → experiment tracking and audit logs
+
 
 Enables:
 
-full system visibility
 
-reproducible pipelines
+- full system visibility
 
-production debugging
+
+- reproducible pipelines
+
+
+- production debugging
 
 
 
@@ -224,15 +283,19 @@ Tech Stack
 
 AI / LLM:
 
+
 LangGraph, LangChain, Phi-3
+
 
 Machine Learning:
 
 XGBoost
 
+
 Backend & Infra:
 
 FastAPI, Redis, PostgreSQL, Docker
+
 
 Evaluation:
 
@@ -245,41 +308,55 @@ Challenges and Engineering Decisions:
 
 API Reliability-
 
+
 Problem: external API failures (Mapbox)
+
 
 Solution: fallback to Haversine distance → ensured 100% uptime
 
 
 LLM Reliability-
 
+
 Problem: incorrect numerical outputs
+
 
 Solution: deterministic Critic layer → sub-millisecond validation
 
 
 Distributed System Issues-
 
+
 Problem: MLflow DNS rebinding in containers
+
 
 Solution: configured host allowlist
 
 
 Example Workflow
 
+
 Input: Waybill / logistics request
+
 
 Output:
 
+
 structured shipment data
+
 
 optimized route
 
+
 predicted pricing
+
 
 validated decision
 
 
+
 🚀 Getting Started
+
 
 1. Prerequisites
 
@@ -287,17 +364,24 @@ validated decision
 
 •	OpenAI API Key (for document proecssing)
 
+
+
  2.How to run:
 
 # Clone the repository
 
+
 git clone https://github.com/yourusername/logiq-agent-ops.git
+
 
 cd logiq-agent-ops
 
+
 # Set up environment variables
 
+
 cp .env.example .env
+
 
 
 # LLM & Tracing
@@ -313,6 +397,7 @@ LANGCHAIN_TRACING_V2="true"
 LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
 
 
+
 # External APIs
 
 MAPBOX_ACCESS_TOKEN=your_mapbox_token
@@ -324,6 +409,7 @@ NOMINATIM_URL=https://nominatim.openstreetmap.org/search
 NOMINATIM_REVERSE_URL=https://nominatim.openstreetmap.org/reverse
 
 APP_USER_AGENT=LogiQ_Senior_Project_V2
+
 
 
 # Databases (Docker Internal)
